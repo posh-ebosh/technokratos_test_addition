@@ -33,10 +33,10 @@ public class OrderController {
     }
 
     @GetMapping(value = "/orders/find_by_code", params = "code")
-    public ResponseEntity<String> getOrdersByCode(@RequestParam("code") String email){
+    public ResponseEntity<String> getOrdersByCode(@RequestParam("code") String code){
         String respUrl = "http://localhost:8080/orders/find_by_code?code={code}";
         ResponseEntity<String> response
-                = restTemplate.getForEntity(respUrl, String.class, email);
+                = restTemplate.getForEntity(respUrl, String.class, code);
         return  response;
     }
 
