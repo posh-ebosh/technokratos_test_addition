@@ -1,0 +1,22 @@
+GET http://localhost:8081/orders
+
+###
+
+GET http://localhost:8081/orders/find_by_email?email=test1@gmail.com
+
+###
+
+GET http://localhost:8081/orders/between_dates?start=19.08.2021+11:00:00&end=23.08.2021+04:34:15
+
+###
+
+POST http://localhost:8081/orders
+S
+
+{
+  "email" : "test5@gmail.com",
+  "products":
+  [
+    "333", "222", "111"
+  ]
+}
