@@ -12,56 +12,88 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Controller
 public class OrderController {
-    private static final String orderPath = "orders";
+    private static final String orderPath = "/orders";
     RestTemplate restTemplate = new RestTemplate();
     @Value("${service.host}")
-    private String serviceURL;
+    private String serviceHost;
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.newInstance();
 
     @GetMapping("/orders")
     public ResponseEntity<String> getOrders () {
-        String respUrl = serviceURL + orderPath; //TODO переделать в билдер
+        String uri = uriComponentsBuilder
+                .scheme("http")
+                .path(serviceHost)
+                .path(orderPath)
+                .build()
+                .toUriString();
         ResponseEntity<String> response
-                = restTemplate.getForEntity(respUrl, String.class);
+                = restTemplate.getForEntity(uri, String.class);
         return  response;
     }
 
     @GetMapping(value = "/orders/find_by_email", params = "email")
     public ResponseEntity<String> getOrdersByEmail(@RequestParam("email") String email){
-        String respUrl = serviceURL + orderPath + OrderControllerEnum.FIND_BY_EMAIL + "email={email}"; //TODO переделать в билдер
+        String uri = uriComponentsBuilder
+                .scheme("http")
+                .host(serviceHost)
+                .path(orderPath)
+                .path(OrderControllerEnum.FIND_BY_EMAIL.getRequestUrl())
+                .queryParam("email", email)
+                .build()
+                .toUriString();
         ResponseEntity<String> response
-                = restTemplate.getForEntity(respUrl, String.class, email);
+                = restTemplate.getForEntity(uri, String.class, email);
         return  response;
     }
 
     @GetMapping(value = "/orders/find_by_code", params = "code")
     public ResponseEntity<String> getOrdersByCode(@RequestParam("code") String code){
-        String respUrl = serviceURL + orderPath + OrderControllerEnum.FIND_BY_CODE + "code={code}"; //TODO переделать в билдер
+        String uri = uriComponentsBuilder
+                .scheme("http")
+                .path(serviceHost)
+                .path(orderPath)
+                .path(OrderControllerEnum.FIND_BY_CODE.getRequestUrl())
+                .queryParam("code", code)
+                .build()
+                .toUriString();
         ResponseEntity<String> response
-                = restTemplate.getForEntity(respUrl, String.class, code);
+                = restTemplate.getForEntity(uri, String.class, code);
         return  response;
     }
 
     @GetMapping(value = {"/orders/between_dates"}, params = {"start", "end"})
     public ResponseEntity<String> getOrdersBetweenDate(@Param("start")String start, @Param("end")String end){
-        String respUrl = serviceURL + orderPath //TODO переделать в билдер
-                + OrderControllerEnum.BETWEEN_DATES.getRequestUri()
-                + "start={start}&end={end}";
+        String uri = uriComponentsBuilder
+                .scheme("http")
+                .path(serviceHost)
+                .path(orderPath)
+                .path(OrderControllerEnum.FIND_BY_CODE.getRequestUrl())
+                .queryParam("start", start)
+                .queryParam("end", end)
+                .build()
+                .toUriString();
         ResponseEntity<String> response
-                = restTemplate.getForEntity(respUrl, String.class, start, end);
+                = restTemplate.getForEntity(uri, String.class, start, end);
         return  response;
     }
 
     @PostMapping("/orders")
     public String addOrder(@RequestBody String request){
-        String respUrl = serviceURL + orderPath; //TODO переделать в билдер
+        String uri = uriComponentsBuilder
+                .scheme("http")
+                .path(serviceHost)
+                .path(orderPath)
+                .build()
+                .toUriString();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> entity = new HttpEntity<>(request, headers);
-        String response  = restTemplate.postForObject(respUrl, entity, String.class);
+        String response  = restTemplate.postForObject(uri, entity, String.class);
         return response;
     }
 
